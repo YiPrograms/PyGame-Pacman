@@ -3,5 +3,6 @@ FPS = 60
 
 MAP_WIDTH = 19
 MAP_HEIGHT = 21
-MAP_SIZE = 45
+BLOCK_SIZE = 45
+
 ASSETS_DIR = './assets'
