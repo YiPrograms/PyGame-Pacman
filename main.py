@@ -1,11 +1,12 @@
-
 import pygame
+
 pygame.init()
 
 from env import *
 
+
 def main():
-    screen = pygame.display.set_mode((BLOCK_WIDTH*BLOCK_SIZE, BLOCK_HEIGHT*BLOCK_SIZE))
+    screen = pygame.display.set_mode((MAP_WIDTH * MAP_SIZE, MAP_HEIGHT * MAP_SIZE))
     pygame.display.set_caption("Pacman")
 
     clock = pygame.time.Clock()
