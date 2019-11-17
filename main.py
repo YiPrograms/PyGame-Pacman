@@ -12,14 +12,12 @@ COLOR = [(251, 86, 90), (114, 55, 197), (45, 133, 222), (28, 196, 171), (241, 22
 def draw_map(file, screen):
     mp = file.read().splitlines()
     vis = set()
-    blk = None
     ptx = {}
     pty = {}
 
     def dfs(x, y):
         def isempty(x, y):
             if 0 <= x < MAP_HEIGHT and 0 <= y < MAP_WIDTH:
-                
                 return mp[x][y] == " "
             return True
         
@@ -28,15 +26,12 @@ def draw_map(file, screen):
         vis.add((x, y))
 
         def addpt(x, y):
-            if x not in ptx.keys():
+            if not x in ptx.keys():
                 ptx[x] = []
-            if y not in pty.keys():
+            if not y in pty.keys():
                 pty[y] = []
             ptx[x].append(y)
-            ptx[y].append(x)
-
-        #blk = (pygame.Rect(y*BLOCK_SIZE, x*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
-        #pygame.draw.rect(screen, COLOR[colorid % 4], blk)
+            pty[y].append(x)
 
         if isempty(x-1, y) and isempty(x, y-1) or isempty(x-1, y-1) and not(isempty(x-1, y) or isempty(x, y-1)):
             addpt(y*BLOCK_SIZE, x*BLOCK_SIZE)
@@ -46,9 +41,6 @@ def draw_map(file, screen):
             addpt((y+1)*BLOCK_SIZE, x*BLOCK_SIZE)
         if isempty(x+1, y) and isempty(x, y+1) or isempty(x+1, y+1) and not(isempty(x+1, y) or isempty(x, y+1)):
             addpt((y+1)*BLOCK_SIZE, (x+1)*BLOCK_SIZE)
-
-        #pygame.display.flip()
-        #time.sleep(0.5)
 
         dfs(x+1, y)
         dfs(x-1, y)
@@ -63,12 +55,14 @@ def draw_map(file, screen):
                 ptx.clear()
                 pty.clear()
                 dfs(i, j)
-                pygame.display.flip()
-                return
-                #colorid += 1
-                
-            # if mp[i][j] == "#":
-            #     pygame.draw.rect(screen, (0, 255, 255), pygame.Rect(j*BLOCK_SIZE, i*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 2)
+                for x in ptx.keys():
+                    ptx[x].sort()
+                    for k in range(0, len(ptx[x]), 2):
+                        pygame.draw.line(screen, (0, 0, 255), (x, ptx[x][k]), (x, ptx[x][k+1]), 5)
+                for y in pty.keys():
+                    pty[y].sort()
+                    for k in range(0, len(pty[y]), 2):
+                        pygame.draw.line(screen, (0, 0, 255), (pty[y][k], y), (pty[y][k+1], y), 5)
 
     pygame.display.flip()
 

@@ -18,6 +18,7 @@ class Search:
         q = PriorityQueue()
         dx = [0, 0, 1, -1]
         dy = [1, -1, 0, 0]
+        vis[start[0]][start[1]] = True
         for i in range(4):
             new_x = start[0] + dx[i]
             new_y = start[1] + dy[i]
@@ -35,6 +36,7 @@ class Search:
                 return obj[2]
             if vis[x][y]:
                 continue
+            vis[x][y] = True
             for i in range(4):
                 new_x = start[0] + dx[i]
                 new_y = start[1] + dy[i]
