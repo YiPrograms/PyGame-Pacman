@@ -5,4 +5,4 @@ MAP_WIDTH = 19
 MAP_HEIGHT = 21
 BLOCK_SIZE = 45
 
-ASSETS_DIR = './assets'
+ASSETS_DIR = "./assets"
