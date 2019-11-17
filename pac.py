@@ -15,13 +15,7 @@ class Pac(pygame.sprite.Sprite):
         self.target = (0, 0)
         self.texture = pygame.image.load(path.join(ASSETS_DIR, texture))
 
-    def move(self):
-        pass
-
-    def set_target(self, row, column):
-        self.target = (row, column)
-
-    def _search(self):
+    def move(self, dx, dy):
         pass
 
     def on_destroy(self):
