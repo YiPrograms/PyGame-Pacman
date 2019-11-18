@@ -9,7 +9,7 @@ class Pac(pygame.sprite.Sprite):
     def __init__(self, mp, pos, all_sprite):
         super().__init__(all_sprite)
         self.pos = pos
-        self.speed = 5
+        self.speed = 5*60/FPS
         self.block_step = round(BLOCK_SIZE/self.speed)
         self.step = 0
         self.dir = 0
