@@ -1,19 +1,20 @@
-import pygame
+#! /usr/bin/env python3
 
+import pygame
 pygame.init()
 
 from env import *
+from pac import Pac
 import os
 import time
 
 COLOR = [(251, 86, 90), (114, 55, 197), (45, 133, 222), (28, 196, 171), (241, 220, 27)]
 
+ptx = {}
+pty = {}
 
-def draw_map(file, screen):
-    mp = file.read().splitlines()
+def create_map(mp):
     vis = set()
-    ptx = {}
-    pty = {}
 
     def dfs(x, y):
         def isempty(x, y):
@@ -46,25 +47,25 @@ def draw_map(file, screen):
         dfs(x-1, y)
         dfs(x, y+1)
         dfs(x, y-1)
-        
 
-    
     for i in range(MAP_HEIGHT):
         for j in range(MAP_WIDTH):
             if (i, j) not in vis and mp[i][j] != " ":
-                ptx.clear()
-                pty.clear()
                 dfs(i, j)
-                for x in ptx.keys():
-                    ptx[x].sort()
-                    for k in range(0, len(ptx[x]), 2):
-                        pygame.draw.line(screen, (0, 0, 255), (x, ptx[x][k]), (x, ptx[x][k+1]), 5)
-                for y in pty.keys():
-                    pty[y].sort()
-                    for k in range(0, len(pty[y]), 2):
-                        pygame.draw.line(screen, (0, 0, 255), (pty[y][k], y), (pty[y][k+1], y), 5)
+        
+def draw_map(screen):
+    for x in ptx.keys():
+        ptx[x].sort()
+        for k in range(0, len(ptx[x]), 2):
+            pygame.draw.line(screen, (0, 0, 255), (x, ptx[x][k]), (x, ptx[x][k+1]), 5)
+            pygame.draw.line(screen, (0, 255, 255), (x, ptx[x][k]), (x, ptx[x][k+1]), 1)
+    for y in pty.keys():
+        pty[y].sort()
+        for k in range(0, len(pty[y]), 2):
+            pygame.draw.line(screen, (0, 0, 255), (pty[y][k], y), (pty[y][k+1], y), 5)
+            pygame.draw.line(screen, (0, 255, 255), (pty[y][k], y), (pty[y][k+1], y), 1)
 
-    pygame.display.flip()
+    
 
 
 def main():
@@ -74,15 +75,34 @@ def main():
     clock = pygame.time.Clock()
 
     f = open(os.path.join(ASSETS_DIR, "map.txt"), "r")
-    draw_map(f, screen)
+    mp = f.read().splitlines()
+    create_map(mp)
     f.close()
+
+    all_sprite = pygame.sprite.Group()
+    pac = Pac(mp, (15, 9), all_sprite)
+    all_sprite.draw(screen)
+    pygame.display.flip()
 
     while running:
         clock.tick(FPS)
-
+        all_sprite.update()
+        screen.fill((0, 0, 0))
+        draw_map(screen)
+        all_sprite.draw(screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    pac.change_dir(1)
+                elif event.key == pygame.K_DOWN:
+                    pac.change_dir(2)
+                elif event.key == pygame.K_LEFT:
+                    pac.change_dir(3)
+                elif event.key == pygame.K_RIGHT:
+                    pac.change_dir(4)
+        pygame.display.flip()
 
 
 if __name__ == "__main__":
