@@ -3,46 +3,86 @@ from os import path
 import pygame
 from env import *
 
-DIR = [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1)]
+DIRECTION = [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1)]
+
 
 class Pac(pygame.sprite.Sprite):
-    def __init__(self, mp, pos, all_sprite):
+    def __init__(self, mp, pos, all_sprite, texture="pac.png"):
         super().__init__(all_sprite)
         self.pos = pos
-        self.speed = 5
-        self.block_step = round(BLOCK_SIZE/self.speed)
+        self.old_pos = pos
+        self.speed = 2
+        self.block_step = round(BLOCK_SIZE / self.speed)
         self.step = 0
         self.dir = 0
-        self.chdir = 0
-        self.onblock = True
-        self.image = pygame.image.load(path.join(ASSETS_DIR, "pac.png"))
-        self.image = pygame.transform.scale(self.image, (BLOCK_SIZE-8, BLOCK_SIZE-8))
+        self.next_dir = 0
+        self.on_block = True
+        self.image = pygame.image.load(path.join(ASSETS_DIR, texture))
+        self.image = pygame.transform.scale(self.image, (BLOCK_SIZE - 8, BLOCK_SIZE - 8))
         self.rect = self.image.get_rect()
-        self.mp = mp
+        self.map = mp
         self.set_pos(pos)
 
-    def isroad(self, pos):
-        return self.mp[pos[0]][pos[1]] == " "
+    def is_road(self, pos):
+        return self.map[pos[0]][pos[1]] == " "
 
-    def change_dir(self, d):
-        if self.isroad((self.pos[0]+DIR[d][0], self.pos[1]+DIR[d][1])):
-            self.chdir = d
+    def ch_dir(self, d):
+        """
+        trying to set new direction for the entity. if there's no way, it would failed and return False.
+        :param d:
+        :return set successfully or not
+        """
+        if self.is_road((self.pos[0] + DIRECTION[d][0], self.pos[1] + DIRECTION[d][1])):
+            self.next_dir = d
+            return True
+        return False
 
-    def get_dir_pos(self, d):
-        x, y = self.pos[0]+DIR[d][0], self.pos[1]+DIR[d][1]
+    def ch_dir_by_new_xy(self, x, y):
+        dx = x - self.get_x()
+        dy = y - self.get_y()
+        dir_id = 0
+        # print("ch dir by xy:", dx, dy)
+
+        for i in range(1, len(DIRECTION)):
+            if dx == DIRECTION[i][0] and dy == DIRECTION[i][1]:
+                dir_id = i
+
+
+                break
+        return self.ch_dir(dir_id)
+
+    def get_next_pos(self, d):
+        x, y = self.pos[0] + DIRECTION[d][0], self.pos[1] + DIRECTION[d][1]
         if y <= -1:
-            y = MAP_WIDTH-1
+            y = MAP_WIDTH - 1
         elif y >= MAP_WIDTH:
             y = 0
-        return (x, y)
+        return x, y
 
     def set_pos(self, pos):
+        self.old_pos = self.pos
         self.pos = pos
-        self.rect.centerx = pos[1]*BLOCK_SIZE + BLOCK_SIZE/2
-        self.rect.centery = pos[0]*BLOCK_SIZE + BLOCK_SIZE/2
-    
+        self.rect.centerx = pos[1] * BLOCK_SIZE + BLOCK_SIZE / 2
+        self.rect.centery = pos[0] * BLOCK_SIZE + BLOCK_SIZE / 2
+
     def get_pos(self):
-        return (self.rect.centery//BLOCK_SIZE, self.rect.centerx//BLOCK_SIZE)
+        return self.pos
+        # return self.rect.centery // BLOCK_SIZE, self.rect.centerx // BLOCK_SIZE
+
+    def get_old_pos(self):
+        return self.old_pos
+
+    def get_x(self):
+        return self.pos[0]
+
+    def get_y(self):
+        return self.pos[1]
+
+    def get_old_x(self):
+        return self.old_pos[0]
+
+    def get_old_y(self):
+        return self.old_pos[1]
 
     def on_destroy(self):
         pass
@@ -50,30 +90,26 @@ class Pac(pygame.sprite.Sprite):
     def destroy(self):
         self.on_destroy()
         self.kill()
-    
+
     def update(self):
-        print(self.pos, self.step, self.dir, self.onblock)
-        if self.onblock:
+        # print(self.pos, self.step, self.dir, self.on_block)
+        if self.on_block:
             self.step = 0
-            if self.chdir:
-                self.dir = self.chdir
-                self.chdir = 0
-                self.onblock = False
+            if self.next_dir:
+                self.dir = self.next_dir
+                self.next_dir = 0
+                self.on_block = False
             if self.dir:
-                if not self.isroad(self.get_dir_pos(self.dir)):
+                if not self.is_road(self.get_next_pos(self.dir)):
                     self.dir = 0
                 else:
-                    self.pos = self.get_dir_pos(self.dir)
-                    self.onblock = False
-                    
-        
+                    self.pos = self.get_next_pos(self.dir)
+                    self.on_block = False
+
         if self.dir:
-            self.rect.centery += DIR[self.dir][0]*self.speed
-            self.rect.centerx += DIR[self.dir][1]*self.speed
+            self.rect.centery += DIRECTION[self.dir][0] * self.speed
+            self.rect.centerx += DIRECTION[self.dir][1] * self.speed
             self.step += 1
             if self.step >= self.block_step:
-                self.onblock = True
+                self.on_block = True
                 self.set_pos(self.pos)
-    
-            
-
