@@ -4,7 +4,7 @@ import pygame
 pygame.init()
 
 from env import *
-from pac import Pac
+from pac import Pac, Ghost
 import os
 import time
 
@@ -13,7 +13,7 @@ COLOR = [(251, 86, 90), (114, 55, 197), (45, 133, 222), (28, 196, 171), (241, 22
 ptx = {}
 pty = {}
 
-def create_map(mp):
+def init_map(mp):
     vis = set()
 
     def dfs(x, y):
@@ -76,11 +76,12 @@ def main():
 
     f = open(os.path.join(ASSETS_DIR, "map.txt"), "r")
     mp = f.read().splitlines()
-    create_map(mp)
+    init_map(mp)
     f.close()
 
     all_sprite = pygame.sprite.Group()
     pac = Pac(mp, (15, 9), all_sprite)
+    ghost = Ghost(mp, (1, 1), all_sprite, pac)
     all_sprite.draw(screen)
     pygame.display.flip()
 

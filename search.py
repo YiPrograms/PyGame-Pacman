@@ -1,54 +1,45 @@
-import numpy as np
+
+
 from queue import PriorityQueue
-import utils
 
+from env import *
 
-class Search:
-    def __init__(self):
-        self.map = np.zeros((30, 30), dtype=np.bool)
+def is_wall(mp, pos, wall):
+        if 0<=pos[0]<MAP_HEIGHT and 0<=pos[1]<MAP_WIDTH:
+            return pos in wall or mp[pos[0]][pos[1]] != " "
+        return True
 
-    def set_map(self, map_array):
-        self.map = map_array
+def astar(mp, s, e, wall):
+    vis = set()
+    pq = PriorityQueue()
+    pq.put((0, 0, s))
+    while not pq.empty():
+        _, g, u = pq.get()
+        if u in vis:
+            continue
+        vis.add(u)
 
-    def update_point(self, x, y, val):
-        self.map[x][y] = val
+        if u == e:
+            return g
 
-    def _search(self, start, end):
-        vis = self.map.copy()
-        q = PriorityQueue()
-        dx = [0, 0, 1, -1]
-        dy = [1, -1, 0, 0]
-        vis[start[0]][start[1]] = True
-        for i in range(4):
-            new_x = start[0] + dx[i]
-            new_y = start[1] + dy[i]
-            if not (0 <= new_x < len(self.map) and 0 <= new_y < len(self.map[0])):
+        for d in DIR:
+            v = (u[0]+d[0], u[1]+d[1])
+            if is_wall(mp, v, wall) or v in vis:
                 continue
-            q.put((utils.mht_distance(new_x, new_y, end[0], end[1]),
-                   (new_x, new_y),
-                   (new_x, new_y),
-                   ))
-        while not q.empty():
-            obj = q.get()
-            x = obj[1][1]
-            y = obj[1][1]
-            if x == end[0] and y == end[1]:
-                return obj[2]
-            if vis[x][y]:
-                continue
-            vis[x][y] = True
-            for i in range(4):
-                new_x = start[0] + dx[i]
-                new_y = start[1] + dy[i]
-                if not (0 <= new_x < len(self.map) and 0 <= new_y < len(self.map[0])):
-                    continue
-                q.put((obj[0] + 1 + utils.mht_distance(new_x, new_y, end[0], end[1]),
-                       (new_x, new_y),
-                       obj[2]
-                       ))
 
-    def search(self, start, end, update=True):
-        x, y = self._search(start, end)
-        if update:
-            self.map[start[0], start[1]] = False
-            self.map[x, y] = True
+            h = g+1 + abs(e[0]-v[0])+abs(e[1]-v[1])
+            pq.put((h, g+1, v))
+    return 1e9
+
+def find_way(mp, pos, e):
+    res = (1e9, 0)
+    for d in range(len(DIR)):
+        s = (pos[0]+DIR[d][0], pos[1]+DIR[d][1])
+        if is_wall(mp, s, []):
+            continue
+        
+        sp = astar(mp, s, e, [pos])
+        res = min(res, (sp, d))
+    
+    return res[1]
+
