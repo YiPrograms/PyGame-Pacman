@@ -21,7 +21,9 @@ class Pac(pygame.sprite.Sprite):
         self.set_pos(pos)
 
     def isroad(self, pos):
-        return self.mp[pos[0]][pos[1]] == " "
+        if 0<=pos[0]<MAP_HEIGHT and 0<=pos[1]<MAP_WIDTH:
+            return self.mp[pos[0]][pos[1]] == " "
+        return False
 
     def change_dir(self, d):
         if self.isroad((self.pos[0]+DIR[d][0], self.pos[1]+DIR[d][1])):
@@ -77,14 +79,8 @@ class Ghost(Pac):
         self.block_step = round(BLOCK_SIZE/self.speed)
         self.image = RGHOST_IMAGE
         
-    def can_turn(self):
-        for d in range(len(DIR)):
-            if self.isroad((self.pos[0]+DIR[d][0], self.pos[1]+DIR[d][1])):
-                return True
-        return False
-        
     def update(self):
-        if self.onblock and self.can_turn():
+        if self.onblock:
             d = find_way(self.mp, self.pos, self.pac.pos)
             self.chdir = d
         super().update()
