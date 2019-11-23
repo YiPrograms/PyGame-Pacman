@@ -4,7 +4,7 @@ import pygame
 pygame.init()
 
 from env import *
-from pac import Pac, Ghost
+from sprite import GameSprites
 import os
 import time
 
@@ -12,6 +12,8 @@ COLOR = [(251, 86, 90), (114, 55, 197), (45, 133, 222), (28, 196, 171), (241, 22
 
 ptx = {}
 pty = {}
+
+road = []
 
 def init_map(mp):
     vis = set()
@@ -52,6 +54,11 @@ def init_map(mp):
         for j in range(MAP_WIDTH):
             if (i, j) not in vis and mp[i][j] != " ":
                 dfs(i, j)
+
+    for i in range(MAP_HEIGHT):
+        for j in range(MAP_WIDTH):
+            if (i, j) not in vis:
+                road.append((i, j))
         
 def draw_map(screen):
     for x in ptx.keys():
@@ -77,33 +84,42 @@ def main():
     f = open(os.path.join(ASSETS_DIR, "map.txt"), "r")
     mp = f.read().splitlines()
     init_map(mp)
+    draw_map(screen)
     f.close()
+    
+    sp = GameSprites(mp)
+    sp.new_pac((15, 9))
+    sp.new_ghost((1, 1), 0)
+    sp.init_pullets(screen, road)
 
-    all_sprite = pygame.sprite.Group()
-    pac = Pac(mp, (15, 9), all_sprite)
-    ghost = Ghost(mp, (1, 1), all_sprite, pac)
-    all_sprite.draw(screen)
     pygame.display.flip()
 
     while running:
         clock.tick(FPS)
-        all_sprite.update()
-        screen.fill((0, 0, 0))
-        draw_map(screen)
-        all_sprite.draw(screen)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    pac.change_dir(1)
+                    sp.change_pac_dir(1)
                 elif event.key == pygame.K_DOWN:
-                    pac.change_dir(2)
+                    sp.change_pac_dir(2)
                 elif event.key == pygame.K_LEFT:
-                    pac.change_dir(3)
+                    sp.change_pac_dir(3)
                 elif event.key == pygame.K_RIGHT:
-                    pac.change_dir(4)
-        pygame.display.flip()
+                    sp.change_pac_dir(4)
+
+        for ghost in sp.pac_touch_ghost():
+            sp.pac_group.empty()
+            sp.new_pac((15, 9))
+        
+        for pullet in sp.eat_pullet():
+            print("Eat!!!")
+
+        sp.update_all()
+        sp.draw_all(screen, [])
+
 
 
 if __name__ == "__main__":

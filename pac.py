@@ -6,8 +6,8 @@ from env import *
 from search import find_way
 
 class Pac(pygame.sprite.Sprite):
-    def __init__(self, mp, pos, all_sprite):
-        super().__init__(all_sprite)
+    def __init__(self, mp, pos):
+        super().__init__()
         self.mp = mp
         self.pos = pos
         self.speed = 5*60/FPS
@@ -72,16 +72,17 @@ class Pac(pygame.sprite.Sprite):
                 self.set_pos(self.pos)
     
 class Ghost(Pac):
-    def __init__(self, mp, pos, all_sprite, pac):
-        super().__init__(mp, pos, all_sprite)
+    def __init__(self, mp, pos, pac, color):
+        super().__init__(mp, pos)
+        self.color = color
         self.pac = pac
         self.speed = 2*60/FPS
         self.block_step = round(BLOCK_SIZE/self.speed)
         self.image = RGHOST_IMAGE
         
     def update(self):
-        if self.onblock:
-            d = find_way(self.mp, self.pos, self.pac.pos)
+        if self.onblock and self.pac:
+            d = find_way(self.mp, self.pos, self.pac.sprites()[0].pos)
             self.chdir = d
         super().update()
 
