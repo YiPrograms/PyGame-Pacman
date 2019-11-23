@@ -35,18 +35,20 @@ def find_way(mp, pos, pac, color):
     res = (1e9, 0)
     wall = [pos]
     e = pac.pos
-    if abs(e[0]-pos[0])+abs(e[1]-pos[1]) >=3:
-        if color == 1:
-            e = pac.get_dir_pos(pac.dir)
-            wall.append(pac.pos)
-        elif color == 2:
-            e = pac.get_dir_pos(REV_DIR[pac.dir])
-            wall.append(pac.pos)
+    if color == 1:
+        e = pac.get_dir_pos(pac.dir)
+        wall.append(pac.pos)
+    elif color == 2:
+        e = pac.get_dir_pos(REV_DIR[pac.dir])
+        wall.append(pac.pos)
 
     for d in range(len(DIR)):
         s = (pos[0]+DIR[d][0], pos[1]+DIR[d][1])
         if is_wall(mp, s, []):
             continue
+        
+        if s==e:
+            return d
     
         sp = astar(mp, s, e, wall)
         res = min(res, (sp, d))
