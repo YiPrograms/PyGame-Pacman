@@ -6,7 +6,7 @@ from env import *
 
 def is_wall(mp, pos, wall):
         if 0<=pos[0]<MAP_HEIGHT and 0<=pos[1]<MAP_WIDTH:
-            return pos in wall or mp[pos[0]][pos[1]] != " "
+            return pos in wall or mp[pos[0]][pos[1]] == "#"
         return True
 
 def astar(mp, s, e, wall):
@@ -19,7 +19,7 @@ def astar(mp, s, e, wall):
             continue
         vis.add(u)
 
-        if u == e:
+        if abs(e[0]-u[0])+abs(e[1]-u[1]) <= 1:
             return g
 
         for d in DIR:
@@ -31,14 +31,24 @@ def astar(mp, s, e, wall):
             pq.put((h, g+1, v))
     return 1e9
 
-def find_way(mp, pos, e):
+def find_way(mp, pos, pac, color):
     res = (1e9, 0)
+    wall = [pos]
+    e = pac.pos
+    if abs(e[0]-pos[0])+abs(e[1]-pos[1]) >=3:
+        if color == 1:
+            e = pac.get_dir_pos(pac.dir)
+            wall.append(pac.pos)
+        elif color == 2:
+            e = pac.get_dir_pos(REV_DIR[pac.dir])
+            wall.append(pac.pos)
+
     for d in range(len(DIR)):
         s = (pos[0]+DIR[d][0], pos[1]+DIR[d][1])
         if is_wall(mp, s, []):
             continue
-        
-        sp = astar(mp, s, e, [pos])
+    
+        sp = astar(mp, s, e, wall)
         res = min(res, (sp, d))
     
     return res[1]

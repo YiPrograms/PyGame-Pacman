@@ -11,6 +11,7 @@ BG_COLOR = (0, 0, 0)
 ASSETS_DIR = "./assets"
 
 DIR = [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1)]
+REV_DIR = [0, 2, 1, 4, 3]
 
 import pygame
 from os import path
@@ -21,5 +22,3 @@ RGHOST_IMAGE = pygame.transform.scale(pygame.image.load(path.join(ASSETS_DIR, "g
                                   (BLOCK_SIZE-8, BLOCK_SIZE-8))
 
 
-PULLET_IMAGE = pygame.Surface((BLOCK_SIZE-8, BLOCK_SIZE-8))
-pygame.draw.circle(PULLET_IMAGE, (255, 255, 255), (PULLET_IMAGE.get_width()//2, PULLET_IMAGE.get_height()//2), BLOCK_SIZE//8)

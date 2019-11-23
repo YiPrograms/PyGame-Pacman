@@ -89,7 +89,9 @@ def main():
     
     sp = GameSprites(mp)
     sp.new_pac((15, 9))
-    sp.new_ghost((1, 1), 0)
+    sp.new_ghost((9, 8), 1)
+    sp.new_ghost((9, 9), 2)
+    sp.new_ghost((9, 10), 3)
     sp.init_pullets(screen, road)
 
     pygame.display.flip()
@@ -109,10 +111,12 @@ def main():
                     sp.change_pac_dir(3)
                 elif event.key == pygame.K_RIGHT:
                     sp.change_pac_dir(4)
+                elif event.key == pygame.K_SPACE:
+                    sp.new_pac((15, 9))
 
-        for ghost in sp.pac_touch_ghost():
+        for ghost in  sp.pac_touch_ghost():
             sp.pac_group.empty()
-            sp.new_pac((15, 9))
+            
         
         for pullet in sp.eat_pullet():
             print("Eat!!!")

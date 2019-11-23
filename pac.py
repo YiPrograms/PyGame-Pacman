@@ -76,15 +76,20 @@ class Ghost(Pac):
         super().__init__(mp, pos)
         self.color = color
         self.pac = pac
-        self.speed = 2*60/FPS
+        self.speed = 3*60/FPS
         self.block_step = round(BLOCK_SIZE/self.speed)
         self.image = RGHOST_IMAGE
         
     def update(self):
         if self.onblock and self.pac:
-            d = find_way(self.mp, self.pos, self.pac.sprites()[0].pos)
+            d = find_way(self.mp, self.pos, self.pac.sprites()[0], self.color)
             self.chdir = d
         super().update()
+
+    def isroad(self, pos):
+        if 0<=pos[0]<MAP_HEIGHT and 0<=pos[1]<MAP_WIDTH:
+            return self.mp[pos[0]][pos[1]] == " " or self.mp[pos[0]][pos[1]] == "X"
+        return False
 
             
 

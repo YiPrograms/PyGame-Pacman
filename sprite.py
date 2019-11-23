@@ -37,16 +37,21 @@ class GameSprites():
         self.pullet_group.update()
     
     def change_pac_dir(self, d):
-        self.get_pac().change_dir(d)
+        if self.pac_group:
+            self.get_pac().change_dir(d)
 
     def get_pac(self):
         return self.pac_group.sprites()[0]
 
     def pac_touch_ghost(self):
-        return pygame.sprite.spritecollide(self.get_pac(), self.ghost_group, False)
+        if self.pac_group:
+            return pygame.sprite.spritecollide(self.get_pac(), self.ghost_group, False)
+        return []
 
     def eat_pullet(self):
-        return pygame.sprite.spritecollide(self.get_pac(), self.pullet_group, True)
+        if self.pac_group:
+            return pygame.sprite.spritecollide(self.get_pac(), self.pullet_group, True)
+        return []
 
     def init_pullets(self, screen, road):
         for pos in road:
