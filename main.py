@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import pygame
+
 pygame.init()
 
 from env import *
@@ -15,6 +16,7 @@ pty = {}
 
 road = []
 
+
 def init_map(mp):
     vis = set()
 
@@ -23,7 +25,7 @@ def init_map(mp):
             if 0 <= x < MAP_HEIGHT and 0 <= y < MAP_WIDTH:
                 return mp[x][y] == " "
             return True
-        
+
         if (x, y) in vis or isempty(x, y):
             return
         vis.add((x, y))
@@ -36,19 +38,23 @@ def init_map(mp):
             ptx[x].append(y)
             pty[y].append(x)
 
-        if isempty(x-1, y) and isempty(x, y-1) or isempty(x-1, y-1) and not(isempty(x-1, y) or isempty(x, y-1)):
-            addpt(y*BLOCK_SIZE, x*BLOCK_SIZE)
-        if isempty(x+1, y) and isempty(x, y-1) or isempty(x+1, y-1) and not(isempty(x+1, y) or isempty(x, y-1)):
-            addpt(y*BLOCK_SIZE, (x+1)*BLOCK_SIZE)
-        if isempty(x-1, y) and isempty(x, y+1) or isempty(x-1, y+1) and not(isempty(x-1, y) or isempty(x, y+1)):
-            addpt((y+1)*BLOCK_SIZE, x*BLOCK_SIZE)
-        if isempty(x+1, y) and isempty(x, y+1) or isempty(x+1, y+1) and not(isempty(x+1, y) or isempty(x, y+1)):
-            addpt((y+1)*BLOCK_SIZE, (x+1)*BLOCK_SIZE)
+        if isempty(x - 1, y) and isempty(x, y - 1) or isempty(x - 1, y - 1) and not (
+                isempty(x - 1, y) or isempty(x, y - 1)):
+            addpt(y * BLOCK_SIZE, x * BLOCK_SIZE)
+        if isempty(x + 1, y) and isempty(x, y - 1) or isempty(x + 1, y - 1) and not (
+                isempty(x + 1, y) or isempty(x, y - 1)):
+            addpt(y * BLOCK_SIZE, (x + 1) * BLOCK_SIZE)
+        if isempty(x - 1, y) and isempty(x, y + 1) or isempty(x - 1, y + 1) and not (
+                isempty(x - 1, y) or isempty(x, y + 1)):
+            addpt((y + 1) * BLOCK_SIZE, x * BLOCK_SIZE)
+        if isempty(x + 1, y) and isempty(x, y + 1) or isempty(x + 1, y + 1) and not (
+                isempty(x + 1, y) or isempty(x, y + 1)):
+            addpt((y + 1) * BLOCK_SIZE, (x + 1) * BLOCK_SIZE)
 
-        dfs(x+1, y)
-        dfs(x-1, y)
-        dfs(x, y+1)
-        dfs(x, y-1)
+        dfs(x + 1, y)
+        dfs(x - 1, y)
+        dfs(x, y + 1)
+        dfs(x, y - 1)
 
     for i in range(MAP_HEIGHT):
         for j in range(MAP_WIDTH):
@@ -59,20 +65,19 @@ def init_map(mp):
         for j in range(MAP_WIDTH):
             if (i, j) not in vis:
                 road.append((i, j))
-        
+
+
 def draw_map(screen):
     for x in ptx.keys():
         ptx[x].sort()
         for k in range(0, len(ptx[x]), 2):
-            pygame.draw.line(screen, (0, 0, 255), (x, ptx[x][k]), (x, ptx[x][k+1]), 5)
-            pygame.draw.line(screen, (0, 255, 255), (x, ptx[x][k]), (x, ptx[x][k+1]), 1)
+            pygame.draw.line(screen, (0, 0, 255), (x, ptx[x][k]), (x, ptx[x][k + 1]), 5)
+            pygame.draw.line(screen, (0, 255, 255), (x, ptx[x][k]), (x, ptx[x][k + 1]), 1)
     for y in pty.keys():
         pty[y].sort()
         for k in range(0, len(pty[y]), 2):
-            pygame.draw.line(screen, (0, 0, 255), (pty[y][k], y), (pty[y][k+1], y), 5)
-            pygame.draw.line(screen, (0, 255, 255), (pty[y][k], y), (pty[y][k+1], y), 1)
-
-    
+            pygame.draw.line(screen, (0, 0, 255), (pty[y][k], y), (pty[y][k + 1], y), 5)
+            pygame.draw.line(screen, (0, 255, 255), (pty[y][k], y), (pty[y][k + 1], y), 1)
 
 
 def main():
@@ -86,7 +91,7 @@ def main():
     init_map(mp)
     draw_map(screen)
     f.close()
-    
+
     sp = GameSprites(mp)
     sp.new_pac((15, 9))
     sp.new_ghost((9, 8), 1)
@@ -114,16 +119,14 @@ def main():
                 elif event.key == pygame.K_SPACE:
                     sp.new_pac((15, 9))
 
-        for ghost in  sp.pac_touch_ghost():
+        for ghost in sp.pac_touch_ghost():
             sp.pac_group.empty()
-            
-        
+
         for pullet in sp.eat_pullet():
             print("Eat!!!")
 
         sp.update_all()
         sp.draw_all(screen, [])
-
 
 
 if __name__ == "__main__":
