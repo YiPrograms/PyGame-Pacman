@@ -100,8 +100,8 @@ def main():
     all_sprite = pygame.sprite.Group()
     player = Pac(pacman_map, (15, 9), all_sprite)
 
-    ghost_blinky = Ghost(pacman_map, (10, 8), all_sprite, texture="blinky.png")
-    ghost_pinky = Ghost(pacman_map, (10, 8), all_sprite, texture="pinky.png")
+    ghost_blinky = Ghost(pacman_map, (10, 8), all_sprite, texture="blinky.png", name="Blinky")
+    ghost_pinky = Ghost(pacman_map, (10, 8), all_sprite, texture="pinky.png", name="Pinky")
     # ghost_inky = Ghost(pacman_map, (15, 9), all_sprite)
     # ghost_clyde = Ghost(pacman_map, (15, 9), all_sprite)
 
@@ -135,6 +135,10 @@ def main():
         # But they can cross the other ghosts.
         player_old_pos = player.get_old_pos()
         player_pos = player.get_pos()
+
+        search.update_point(player_old_pos[0], player_old_pos[1], False)
+        search.update_point(player_pos[0], player_pos[1], True)
+
         """
         Blinky will simply trace the player in the shortest way.
         pinky will aim to 2 blocks in front of player.
@@ -152,8 +156,6 @@ def main():
         p_x, p_y = search.search(ghost_pinky.get_pos(), pinky_target)
         ghost_pinky.ch_dir_by_new_xy(p_x, p_y)
 
-        search.update_point(player_old_pos[0], player_old_pos[1], False)
-        search.update_point(player_pos[0], player_pos[1], True)
 
 
 

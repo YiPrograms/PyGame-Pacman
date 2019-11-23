@@ -1,3 +1,4 @@
+import time
 from os import path
 
 import pygame
@@ -7,15 +8,16 @@ DIRECTION = [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1)]
 
 
 class Pac(pygame.sprite.Sprite):
-    def __init__(self, mp, pos, all_sprite, texture="pac.png"):
+    def __init__(self, mp, pos, all_sprite, texture="pac.png", name="Pacman"):
         super().__init__(all_sprite)
+        self.name = name
         self.pos = pos
         self.old_pos = pos
         self.speed = 2
         self.block_step = round(BLOCK_SIZE / self.speed)
 
-        self.speed = 5*60/FPS
-        self.block_step = round(BLOCK_SIZE/self.speed)
+        # self.speed = 5*60/FPS
+        self.block_step = round(BLOCK_SIZE / self.speed)
 
         self.step = 0
         self.dir = 0
@@ -28,6 +30,10 @@ class Pac(pygame.sprite.Sprite):
         self.set_pos(pos)
 
     def is_road(self, pos):
+        if pos[0] >= len(self.map):
+            return False
+        if pos[1] >= len(self.map[pos[0]]):
+            return False
         return self.map[pos[0]][pos[1]] == " "
 
     def ch_dir(self, d):
@@ -39,6 +45,8 @@ class Pac(pygame.sprite.Sprite):
         if self.is_road((self.pos[0] + DIRECTION[d][0], self.pos[1] + DIRECTION[d][1])):
             self.next_dir = d
             return True
+        else:
+            print("[%s] [%s] no path there!" % (time.time(), self.name))
         return False
 
     def ch_dir_by_new_xy(self, x, y):
@@ -47,10 +55,9 @@ class Pac(pygame.sprite.Sprite):
         dir_id = 0
         # print("ch dir by xy:", dx, dy)
 
-        for i in range(1, len(DIRECTION)):
+        for i in range(len(DIRECTION)):
             if dx == DIRECTION[i][0] and dy == DIRECTION[i][1]:
                 dir_id = i
-
 
                 break
         return self.ch_dir(dir_id)

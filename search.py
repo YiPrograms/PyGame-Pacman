@@ -22,6 +22,8 @@ class Search:
         return self
 
     def update_point(self, x, y, val):
+        if self.map[x][y] != val:
+            print("set", x, y, val)
         self.map[x][y] = val
 
     def _search(self, start, end):
@@ -56,22 +58,21 @@ class Search:
                 new_y = y + dy[i]
                 if not (0 <= new_x < len(self.map) and 0 <= new_y < len(self.map[0])):
                     continue
-                q.put((obj[0] + 1 + utils.mht_distance(new_x, new_y, end[0], end[1]),
+                q.put((obj[0] + utils.mht_distance(new_x, new_y, end[0], end[1]),
                        (new_x, new_y),
                        obj[2]
                        ))
 
                 # input()
+        print("Can't find next pos.")
         return start
 
-
-    def search(self, start, end, update=True):
+    def search(self, start, end, update=False):
         x, y = self._search(start, end)
         # print("search:", x, y)
 
-        '''
-        if update:
+        if update:  # buggy
             self.map[start[0], start[1]] = self.map_origin[start[0], start[1]]
             self.map[x, y] = True
-        '''
+
         return x, y
