@@ -13,6 +13,10 @@ class Pac(pygame.sprite.Sprite):
         self.old_pos = pos
         self.speed = 2
         self.block_step = round(BLOCK_SIZE / self.speed)
+
+        self.speed = 5*60/FPS
+        self.block_step = round(BLOCK_SIZE/self.speed)
+
         self.step = 0
         self.dir = 0
         self.next_dir = 0
