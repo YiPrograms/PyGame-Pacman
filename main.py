@@ -14,7 +14,8 @@ COLOR = [(251, 86, 90), (114, 55, 197), (45, 133, 222), (28, 196, 171), (241, 22
 ptx = {}
 pty = {}
 
-road = []
+small_pul = []
+power_pul = []
 
 
 def init_map(mp):
@@ -23,7 +24,7 @@ def init_map(mp):
     def dfs(x, y):
         def isempty(x, y):
             if 0 <= x < MAP_HEIGHT and 0 <= y < MAP_WIDTH:
-                return mp[x][y] == " "
+                return mp[x][y] != "#"
             return True
 
         if (x, y) in vis or isempty(x, y):
@@ -58,13 +59,12 @@ def init_map(mp):
 
     for i in range(MAP_HEIGHT):
         for j in range(MAP_WIDTH):
-            if (i, j) not in vis and mp[i][j] != " ":
+            if mp[i][j] == "#" and (i, j) not in vis:
                 dfs(i, j)
-
-    for i in range(MAP_HEIGHT):
-        for j in range(MAP_WIDTH):
-            if (i, j) not in vis:
-                road.append((i, j))
+            elif mp[i][j] == " ":
+                small_pul.append((i, j))
+            elif mp[i][j] == "B":
+                power_pul.append((i, j))
 
 
 def draw_map(screen):
@@ -85,6 +85,10 @@ def main():
     pygame.display.set_caption("Pacman")
 
     clock = pygame.time.Clock()
+    
+    SPLASH_EVENT = pygame.USEREVENT + 1
+    SPLASH_TIME = 150
+    pygame.time.set_timer(SPLASH_EVENT, SPLASH_TIME)
 
     f = open(os.path.join(ASSETS_DIR, "map.txt"), "r")
     mp = f.read().splitlines()
@@ -94,10 +98,14 @@ def main():
 
     sp = GameSprites(mp)
     sp.new_pac((15, 9))
-    sp.new_ghost((9, 8), 1)
-    sp.new_ghost((9, 9), 2)
+    sp.new_ghost((9, 8), 0)
+    sp.new_ghost((9, 9), 1)
+    sp.new_ghost((9, 10), 2)
     sp.new_ghost((9, 10), 3)
-    sp.init_pullets(screen, road)
+    sp.init_pullets(screen, small_pul, power_pul)
+    
+    power_mode = False
+    power_time = 0
 
     pygame.display.flip()
 
@@ -116,14 +124,34 @@ def main():
                     sp.change_pac_dir(3)
                 elif event.key == pygame.K_RIGHT:
                     sp.change_pac_dir(4)
-                elif event.key == pygame.K_SPACE:
-                    sp.new_pac((15, 9))
+            if event.type == SPLASH_EVENT:
+                sp.splash()
+                if power_mode:
+                    power_time -= 1
 
         for ghost in sp.pac_touch_ghost():
-            sp.pac_group.empty()
+            if not ghost.going_home:
+                if ghost.afraid:
+                    sp.eat_ghost(ghost)
+                else:
+                    if not sp.get_pac().splash:
+                        sp.pac_group.empty()
+                        sp.new_pac((15, 9))
 
-        for pullet in sp.eat_pullet():
+        for pullet in sp.eat_small_pullet():
             print("Eat!!!")
+            
+        for pullet in sp.eat_power_pullet():
+            power_time = 80
+            power_mode = True
+            sp.set_power(True)
+                
+        if power_mode:
+            if power_time == 16:
+                sp.power_almost_over()
+            elif power_time <= 0:
+                power_mode = False
+                sp.set_power(False)
 
         sp.update_all()
         sp.draw_all(screen, [])

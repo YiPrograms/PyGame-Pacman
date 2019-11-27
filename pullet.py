@@ -2,7 +2,7 @@ import pygame
 
 from env import *
 
-class Pullet(pygame.sprite.Sprite):
+class SPullet(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
         self.x = int(pos[1]*BLOCK_SIZE + BLOCK_SIZE/2)
@@ -13,3 +13,7 @@ class Pullet(pygame.sprite.Sprite):
 
     def draw(self, screen):
         pygame.draw.circle(screen, (255, 255, 255), (self.x, self.y), BLOCK_SIZE//8)
+        
+class PPullet(SPullet):
+    def draw(self, screen):
+        pygame.draw.circle(screen, (255, 255, 255), (self.x, self.y), BLOCK_SIZE//5)
