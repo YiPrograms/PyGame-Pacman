@@ -84,6 +84,16 @@ def main():
     screen = pygame.display.set_mode((MAP_WIDTH * BLOCK_SIZE, MAP_HEIGHT * BLOCK_SIZE))
     pygame.display.set_caption("Pacman")
 
+    global PAC_IMAGE
+    global GHOST_EYES
+    global GHOST_AFRAID
+
+    PAC_IMAGE.convert()
+    GHOST_EYES.convert()
+    GHOST_AFRAID.convert()
+    for img in GHOST_IMAGES:
+        img.convert()
+
     clock = pygame.time.Clock()
     
     SPLASH_EVENT = pygame.USEREVENT + 1
